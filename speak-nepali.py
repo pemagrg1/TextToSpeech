@@ -33,6 +33,7 @@ class Speak:
                 time.sleep(delay)
                 #delay = 0.6
                 order = AudioSegment.from_file("./sounds/"+sound)
+                # extract = order[0:5000]
                 combined += order
 
 
