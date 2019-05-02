@@ -9,6 +9,8 @@ import wave
 import pyaudio
 import modules.parts as parts
 import modules.loadsound as loadsound
+from pydub import AudioSegment
+
 
 class Speak:
     def __init__(self,string):
@@ -20,14 +22,18 @@ class Speak:
         starts thread to play the sound
         """
         delay = 0.17
+        combined = AudioSegment.empty()
         for l in self.letters:
             sound = l+".wav"
             if sound in self.database:
-                #self.playsound(sound,delay)
+                # print(sound)
+                # self.playsound(sound,delay)
                 thread.start_new_thread(self.playsound,(sound,delay))
                 time.sleep(delay)
                 #delay = 0.6
-
+                order = AudioSegment.from_file("./sounds/"+sound)
+                combined += order
+        combined.export("/media/ekbana/ekbana500/randomfiles/nepali Speech/nepali-text-speech/output/combined.wav", format='wav')
 
     def playsound(self,sound,delay):
         """
