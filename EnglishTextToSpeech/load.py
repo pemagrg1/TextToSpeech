@@ -40,15 +40,16 @@ class TextToSpeech:
             sound = pron.lower() + ".wav"
             _thread.start_new_thread(self.play_audio, (sound,delay))
             delay += 0.145
-            order = AudioSegment.from_file("./sounds/" + sound)
+            order = AudioSegment.from_file(PROJECT_PATH + "EnglishTextToSpeech/sounds/" + sound)
             # extract = order[0:5000]
             combined += order
 
-        # combined.export(PROJECT_PATH + "NepaliTextToSpeech/output/combined1.wav",
+        # combined.export(PROJECT_PATH + "EnglishTextToSpeech/output/combined1.wav",
         #                 format='wav')
 
     def play_audio(self,sound, delay):
         try:
+            print ("----")
             time.sleep(delay)
             wf = wave.open(PROJECT_PATH+"EnglishTextToSpeech/sounds/"+sound, 'rb')
             p = pyaudio.PyAudio()
