@@ -11,10 +11,6 @@ import wave
 import pyaudio
 from pydub import AudioSegment
 
-
-
-
-
 class Speak:
     def __init__(self,string):
         self.database = self.listfiles(PROJECT_PATH+"data/nepali_sounds/")
