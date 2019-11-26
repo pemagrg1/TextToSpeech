@@ -10,6 +10,8 @@ import wave
 import pyaudio
 import _thread
 import time
+from pydub import AudioSegment
+
 
 class TextToSpeech:
     
@@ -33,14 +35,22 @@ class TextToSpeech:
                 list_pron += self._l[word]
         print(list_pron)
         delay=0
+        combined = AudioSegment.empty()
         for pron in list_pron:
-            _thread.start_new_thread( TextToSpeech._play_audio, (pron,delay,))
+            sound = pron.lower() + ".wav"
+            _thread.start_new_thread(self.play_audio, (sound,delay))
             delay += 0.145
-    
-    def _play_audio(sound, delay):
+            order = AudioSegment.from_file("./sounds/" + sound)
+            # extract = order[0:5000]
+            combined += order
+
+        # combined.export(PROJECT_PATH + "NepaliTextToSpeech/output/combined1.wav",
+        #                 format='wav')
+
+    def play_audio(self,sound, delay):
         try:
             time.sleep(delay)
-            wf = wave.open("sounds/"+sound+".wav", 'rb')
+            wf = wave.open(PROJECT_PATH+"EnglishTextToSpeech/sounds/"+sound, 'rb')
             p = pyaudio.PyAudio()
             stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
                             channels=wf.getnchannels(),
@@ -48,10 +58,11 @@ class TextToSpeech:
                             output=True)
             
             data = wf.readframes(TextToSpeech.CHUNK)
-            
+            print("==",data)
             while data:
                 stream.write(data)
                 data = wf.readframes(TextToSpeech.CHUNK)
+                print(type(data))
         
             stream.stop_stream()
             stream.close()
@@ -66,5 +77,4 @@ class TextToSpeech:
 
 if __name__ == '__main__':
     tts = TextToSpeech()
-    while True:
-        tts.get_pronunciation(input('Enter a word or phrase: '))
+    tts.get_pronunciation("ga")
