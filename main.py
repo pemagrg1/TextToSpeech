@@ -1,12 +1,14 @@
 #!/usr/bin/python
 # vim encoding: utf-8
 import os
+import re
 from dotenv import load_dotenv,find_dotenv
 load_dotenv(find_dotenv(), override=True)
 PROJECT_PATH = os.environ.get("PROJECTPATH")
 
 import _thread as thread
 import time
+import _thread
 import wave
 import pyaudio
 from pydub import AudioSegment
@@ -16,6 +18,8 @@ class Speak:
         self.database = self.listfiles(PROJECT_PATH+"data/nepali_sounds/")
         if language=="nep":
             self.play_nep(string)
+        elif language == "eng":
+            self.play_eng(string)
 
     def listfiles(self,dirs):
         for root, dirs, files in os.walk(dirs):
@@ -79,6 +83,15 @@ class Speak:
         print(shabda)
         return shabda
 
+    def _load_words(self, words_pron_dict:str):
+        l = {}
+        with open(words_pron_dict, 'r') as file:
+            for line in file:
+                if not line.startswith(';;;'):
+                    key, val = line.split('  ',2)
+                    l[key] = re.findall(r"[A-Z]+",val)
+        return l
+
     def play_nep(self,string):
         """
         starts thread to play the sound
@@ -91,7 +104,7 @@ class Speak:
             if sound in self.database:
                 # print(sound)
                 # self.playsound(sound,delay)
-                thread.start_new_thread(self.playsound,(sound,delay))
+                thread.start_new_thread(self.playsound,(sound,delay,PROJECT_PATH+"data/nepali_sounds/"+sound))
                 time.sleep(delay)
                 #delay = 0.6
                 order = AudioSegment.from_file(PROJECT_PATH+"data/nepali_sounds/"+sound)
@@ -101,7 +114,31 @@ class Speak:
 
         combined.export(PROJECT_PATH+"output/"+string+".wav", format='wav')
 
-    def playsound(self,sound,delay):
+    def play_eng(self,string):
+        """
+        starts thread to play the sound
+        """
+        _l = self._load_words(PROJECT_PATH + "data/cmudict-0.7b.txt")
+
+        list_pron = []
+        for word in re.findall(r"[\w']+", string.upper()):
+            if word in _l:
+                list_pron += _l[word]
+        print(list_pron)
+        delay = 0
+        combined = AudioSegment.empty()
+        for pron in list_pron:
+            sound = pron.lower() + ".wav"
+            _thread.start_new_thread(self.playsound, (sound, delay,PROJECT_PATH+"data/english_sounds/"+sound))
+            delay += 0.145
+            order = AudioSegment.from_file(
+                PROJECT_PATH + "data/english_sounds/" + sound)
+            # extract = order[0:5000]
+            combined += order
+
+        combined.export(PROJECT_PATH + "output/" + string + ".wav",
+                        format='wav')
+    def playsound(self,sound,delay,path):
         """
         plays the sound
             this code is from docs of pyaudio
@@ -110,7 +147,8 @@ class Speak:
         try:
             CHUNK = 1024
             #time.sleep(delay)
-            wf = wave.open(PROJECT_PATH+"data/nepali_sounds/"+sound, 'rb')
+            #PROJECT_PATH+"data/nepali_sounds/"+sound
+            wf = wave.open(path, 'rb')
             print ()
             #instantiate pyaudio
             p = pyaudio.PyAudio()
@@ -142,9 +180,8 @@ class Speak:
 
 if __name__ == "__main__":
     try:
-        # a = Speak(sys.argv[1])
-        a = Speak("समाचार के छ","nep")
-        # a.play()
+        # a = Speak("समाचार के छ","nep")
+        a = Speak("ga","eng")
 
     except Exception as e:
         print (e)
