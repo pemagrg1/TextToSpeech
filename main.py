@@ -12,9 +12,10 @@ import pyaudio
 from pydub import AudioSegment
 
 class Speak:
-    def __init__(self,string):
+    def __init__(self,string,language):
         self.database = self.listfiles(PROJECT_PATH+"data/nepali_sounds/")
-        self.play(string)
+        if language=="nep":
+            self.play_nep(string)
 
     def listfiles(self,dirs):
         for root, dirs, files in os.walk(dirs):
@@ -78,8 +79,7 @@ class Speak:
         print(shabda)
         return shabda
 
-
-    def play(self,string):
+    def play_nep(self,string):
         """
         starts thread to play the sound
         """
@@ -143,7 +143,7 @@ class Speak:
 if __name__ == "__main__":
     try:
         # a = Speak(sys.argv[1])
-        a = Speak("समाचार के छ")
+        a = Speak("समाचार के छ","nep")
         # a.play()
 
     except Exception as e:
