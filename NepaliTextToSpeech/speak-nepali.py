@@ -1,23 +1,25 @@
 #!/usr/bin/python
 # vim encoding: utf-8
-import sys
+import os
+from dotenv import load_dotenv,find_dotenv
+load_dotenv(find_dotenv(), override=True)
+PROJECT_PATH = os.environ.get("PROJECTPATH")
+
 import _thread as thread
-
-
 import time
 import wave
 import pyaudio
 import modules.parts as parts
 import modules.loadsound as loadsound
 from pydub import AudioSegment
-import librosa
 
 
 class Speak:
     def __init__(self,string):
-        self.database = loadsound.listfiles("sounds/");
+        self.database = loadsound.listfiles(PROJECT_PATH+"NepaliTextToSpeech/sounds/")
         self.letters = parts.letters(parts.part(string))
         self.play()
+
     def play(self):
         """
         starts thread to play the sound
@@ -37,7 +39,7 @@ class Speak:
                 combined += order
 
 
-        combined.export("/media/ekbana/ekbana500/randomfiles/nepali Speech/nepali-text-speech/output/combined1.wav", format='wav')
+        combined.export(PROJECT_PATH+"NepaliTextToSpeech/output/combined1.wav", format='wav')
 
     def playsound(self,sound,delay):
         """
