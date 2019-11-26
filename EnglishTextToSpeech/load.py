@@ -1,5 +1,10 @@
-#Written by Alex I. Ramirez @alexram1313
-#arcompware.com
+#!/usr/bin/python
+# vim encoding: utf-8
+import os
+from dotenv import load_dotenv,find_dotenv
+load_dotenv(find_dotenv(), override=True)
+PROJECT_PATH = os.environ.get("PROJECTPATH")
+
 import re
 import wave
 import pyaudio
